@@ -1,51 +1,53 @@
 # yapi-mcp
 
-> 零依赖的 [YApi](https://github.com/YMFE/yapi) [MCP](https://modelcontextprotocol.io) server，为 Claude Code 及任意 MCP 客户端暴露 YApi 的接口管理能力。
+> English | [中文](README.zh-CN.md)
 
-## 为什么有这个
+> A zero-dependency [YApi](https://github.com/YMFE/yapi) [MCP](https://modelcontextprotocol.io) server that exposes YApi's API-management capabilities to Claude Code and any MCP client.
 
-npm 上的 `@yogeliu/yapi-mcp-server` 存在两个导致**完全不可用**的缺陷：
+## Why this exists
 
-1. **`inputSchema` 序列化错误**：把 Zod schema 对象本身当作 `inputSchema` 返回，`JSON.stringify` 后变成 `{"_def":...}` 非法结构，MCP 客户端校验失败、报 `tools fetch failed`，所有工具都加载不出来。
-2. **接口列表策略错误**：YApi 的 `/api/interface/list` 在多数版本上**忽略 `catid`** 且默认仅返回前若干条，原包「遍历分类」的策略会让结果大量重复并漏掉绝大多数接口；同时接口 id 字段（`_id`）取错，导致拿不到有效 id。
+The npm package `@yogeliu/yapi-mcp-server` has two defects that make it **completely unusable**:
 
-本项目从零重写，**零运行时依赖**（仅用 Node ≥18 内置 `fetch`），手写合法 JSON Schema，并以 project 级分页 + 去重拉取接口，彻底修复上述问题。
+1. **Broken `inputSchema` serialization** — it returns the Zod schema *object* itself as `inputSchema`. After `JSON.stringify` it becomes `{"_def":...}`, an invalid structure. MCP clients reject it with `tools fetch failed`, so none of the tools ever load.
+2. **Wrong interface-list strategy** — YApi's `/api/interface/list` **ignores `catid`** on most versions and returns only the first page by default. The original package's "iterate categories" approach causes massive duplication and misses most interfaces; it also reads the wrong id field (`_id`).
 
-## 提供的工具
+This project is rewritten from scratch with **zero runtime dependencies** (only Node ≥18 built-in `fetch`), hand-written valid JSON Schemas, and project-level pagination with dedup — fixing all of the above.
 
-| 工具 | 说明 |
+## Tools
+
+| Tool | Description |
 |---|---|
-| `yapi_list_projects` | 列出 token 配置的项目信息（id / 名称 / 描述） |
-| `yapi_get_categories` | 获取项目分类及每个分类下的接口 |
-| `yapi_search_apis` | 按关键词（title / path）搜索接口，可选 method 过滤 |
-| `yapi_get_api_details` | 获取单个接口完整详情（参数 / 请求头 / 请求体 / 响应体等） |
-| `yapi_save_api` | 创建或更新接口（带 `api_id` 走更新，否则创建） |
+| `yapi_list_projects` | List the configured project (id / name / desc) |
+| `yapi_get_categories` | List project categories and the APIs under each |
+| `yapi_search_apis` | Search APIs by keyword (title / path), optional method filter |
+| `yapi_get_api_details` | Full detail of one API (params / headers / body / response) |
+| `yapi_save_api` | Create or update an API (with `api_id` → update; without → create) |
 
-## 安装
+## Install
 
-### 方式一：npx 直接跑（推荐）
+### Option 1: npx (recommended)
 
-无需安装，MCP 配置里写：
+No install needed — use it directly in your MCP config:
 ```json
 { "command": "npx", "args": ["-y", "@mail-tom/yapi-mcp"] }
 ```
 
-### 方式二：克隆源码
+### Option 2: clone
 ```bash
 git clone https://github.com/hizml/yapi-mcp.git
 ```
-配置里指向本地文件：
+Point the config at the local file:
 ```json
 { "command": "node", "args": ["/absolute/path/to/yapi-mcp/yapi-mcp.mjs"] }
 ```
 
-## 配置
+## Configuration
 
-两个环境变量：
-- `YAPI_BASE_URL`：YApi 地址，如 `http://yapi.example.com`
-- `YAPI_TOKEN`：格式 `projectId:tokenValue`，在 YApi 项目「设置 → token 配置」获取
+Two environment variables:
+- `YAPI_BASE_URL` — YApi host, e.g. `http://yapi.example.com`
+- `YAPI_TOKEN` — format `projectId:tokenValue`, from the YApi project "Settings → token"
 
-### Claude Code（`~/.claude.json`）
+### Claude Code (`~/.claude.json`)
 ```json
 {
   "mcpServers": {
@@ -61,20 +63,20 @@ git clone https://github.com/hizml/yapi-mcp.git
   }
 }
 ```
-完整示例见 [`examples/claude-code-config.json`](examples/claude-code-config.json)。
+Full example: [`examples/claude-code-config.json`](examples/claude-code-config.json).
 
-## 特性
+## Features
 
-- **零依赖**：纯 Node ESM，仅依赖 Node ≥18 内置 `fetch`
-- **合法 JSON Schema**：所有 `inputSchema` 手写为标准 JSON Schema，客户端校验通过
-- **分页拉全**：project 级分页 + 去重，接口列表准确无遗漏
-- **健壮错误处理**：参数错误、网络超时、YApi `errcode` 均转为中文 `isError` 提示，进程不崩溃
-- **可调试**：设置 `DEBUG=1` 向 stderr 输出日志
+- **Zero dependencies** — pure Node ESM, only Node ≥18 built-in `fetch`
+- **Valid JSON Schema** — every `inputSchema` is hand-written standard JSON Schema, so clients validate it fine
+- **Full pagination** — project-level pagination + dedup, no missing or duplicate APIs
+- **Robust errors** — param errors, timeouts, and YApi `errcode` all become `isError` messages; the process never crashes
+- **Debuggable** — set `DEBUG=1` to emit logs to stderr
 
-## 已知限制
+## Known limitations
 
-- 当前为**单 token（单项目）**模式；多项目请配置多个实例
-- YApi `/api/interface/list` 的 `total` 字段不可靠，本工具以「分页拉到不足一页」作为终止条件
+- Currently **single-token (single-project)**; for multiple projects, run multiple instances
+- YApi's `/api/interface/list` `total` field is unreliable, so this tool stops paginating when a page returns fewer than the page size
 
 ## License
 
