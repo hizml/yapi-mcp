@@ -1,0 +1,41 @@
+{
+  "name": "@mail-tom/yapi-mcp",
+  "version": "1.0.0",
+  "description": "零依赖 YApi MCP server：暴露项目/分类/接口查询与写入工具，修复原包 inputSchema 与接口列表分页问题。",
+  "type": "module",
+  "main": "yapi-mcp.mjs",
+  "bin": {
+    "yapi-mcp": "yapi-mcp.mjs"
+  },
+  "files": [
+    "yapi-mcp.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node yapi-mcp.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "yapi",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "claude-code",
+    "api-management",
+    "openapi",
+    "stdio"
+  ],
+  "license": "MIT",
+  "author": "hizml",
+  "homepage": "https://github.com/hizml/yapi-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hizml/yapi-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hizml/yapi-mcp/issues"
+  }
+}

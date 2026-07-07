@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "yapi": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@mail-tom/yapi-mcp"],
+      "env": {
+        "YAPI_BASE_URL": "http://your-yapi-host",
+        "YAPI_TOKEN": "PROJECT_ID:YOUR_TOKEN_HERE"
+      }
+    }
+  }
+}
