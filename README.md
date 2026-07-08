@@ -29,7 +29,7 @@ This project is rewritten from scratch with **zero runtime dependencies** (only 
 
 No install needed — use it directly in your MCP config:
 ```json
-{ "command": "npx", "args": ["-y", "@mail-tom/yapi-mcp"] }
+{ "command": "npx", "args": ["-y", "@hizml/yapi-mcp"] }
 ```
 
 ### Option 2: clone
@@ -54,7 +54,7 @@ Two environment variables:
     "yapi": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@mail-tom/yapi-mcp"],
+      "args": ["-y", "@hizml/yapi-mcp"],
       "env": {
         "YAPI_BASE_URL": "http://your-yapi-host",
         "YAPI_TOKEN": "227:your_token_here"
