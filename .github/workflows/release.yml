@@ -21,10 +21,10 @@ jobs:
       - name: 拉取代码
         uses: actions/checkout@v4
 
-      - name: 安装 Node 20
+      - name: 安装 Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'   # 自动用 NODE_AUTH_TOKEN 配置 .npmrc
 
       - name: 校验 tag 与 package.json 版本一致
